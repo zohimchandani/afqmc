@@ -1,0 +1,8 @@
+h5py==3.11.0
+matplotlib==3.9.2
+numpy~=1.24.4
+openfermion==1.6.1
+pyscf~=2.5.0
+scipy~=1.14.1
+pandas~=2.2.2
+ipie @ git+https://github.com/JoonhoLee-Group/ipie
