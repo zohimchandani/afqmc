@@ -190,9 +190,7 @@ def get_molecular_hamiltonian(
         spin=0,
         charge=0,
         create_cudaq_ham=False,
-        verbose=0,
-        label_molecule="molecule",
-        dir_save_hamiltonian="./") -> dict:
+        verbose=0) -> dict:
     """
      Compute the molecular Hamiltonian for a given molecule using Hartree-Fock and CASCI methods.
      :param int num_active_orbitals: Number of active orbitals for the CASCI calculation.
@@ -205,8 +203,6 @@ def get_molecular_hamiltonian(
      :param int charge: Charge of the molecule. Default is 0.
      :param bool create_cudaq_ham: True if cuda quantum hamiltonian should be computed
      :param int verbose: Verbosity level of the calculation. Default is 0.
-     :param str label_molecule: optional label for saving the hamiltonian file
-     :param str dir_save_hamiltonian: optional directory name for saving the hamiltonian file
 
     :return: A dictionary containing the SCF data and optionally the CUDA quantum Hamiltonian.
     :rtype: dict
@@ -266,7 +262,7 @@ def get_molecular_hamiltonian(
     print('# Start CAS computation')
     if chkptfile_cas:
         mo = chkfile.load(chkptfile_cas, 'mcscf/mo_coeff')
-        e_tot, e_cas, fcivec, mo, mo_energy = my_casci.kernel(mo)
+        e_tot, e_cas, fcivec, mo_output, mo_energy = my_casci.kernel(mo)
     else:
         e_tot, e_cas, fcivec, mo_output, mo_energy = my_casci.kernel()
     print('# Energy CAS', e_tot)
