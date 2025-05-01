@@ -236,7 +236,7 @@ class VQE(object):
                                         theta).expectation()
 
             callback_energies.append(exp_val)
-            print('exp_val', exp_val)
+            # print('exp_val', exp_val)
             return exp_val
 
         energy_core = options.get('energy_core', 0.)

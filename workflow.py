@@ -22,8 +22,8 @@ cudaq.set_target("nvidia", option="mqpu")
 
 
 # system = 'o3' 
-# system = '10q' 
-system = '24q' 
+system = '10q' 
+# system = '24q' 
 
 if system == 'o3':
 
