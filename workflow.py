@@ -18,12 +18,12 @@ from src.vqe_cudaq_qnp import VQE
 import matplotlib.pyplot as plt
 
 import cudaq 
-cudaq.set_target("nvidia", option="mqpu")
-
+# cudaq.set_target("nvidia", option="mqpu")
+cudaq.set_target("nvidia")
 
 # system = 'o3' 
-# system = '10q' 
-system = '24q' 
+system = '10q' 
+# system = '24q' 
 
 if system == 'o3':
 
