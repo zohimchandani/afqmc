@@ -268,32 +268,32 @@ class VQE(object):
                   "time_vqe": end_t - start_t,
                   "initial_energy": initial_energy + energy_core}
 
-        cwd = os.getcwd()
-        save_data_dir = os.path.join(cwd, "data")
-        os.makedirs(save_data_dir, exist_ok=True)
+        # cwd = os.getcwd()
+        # save_data_dir = os.path.join(cwd, "data")
+        # os.makedirs(save_data_dir, exist_ok=True)
 
-        fname = f"callback_energies_fenta_" \
-                f"cas_{self.n_qubits}q_" \
-                f"layer_{self.n_layers}_opt_{method_optimizer}.dat"
+        # fname = f"callback_energies_fenta_" \
+        #         f"cas_{self.n_qubits}q_" \
+        #         f"layer_{self.n_layers}_opt_{method_optimizer}.dat"
 
-        np.savetxt(os.path.join(save_data_dir, fname),
-                   callback_energies)
+        # np.savetxt(os.path.join(save_data_dir, fname),
+        #            callback_energies)
 
-        fname = f"best_params_fenta_" \
-                f"cas_{self.n_qubits}q_" \
-                f"layer_{self.n_layers}_opt_{method_optimizer}.dat"
+        # fname = f"best_params_fenta_" \
+        #         f"cas_{self.n_qubits}q_" \
+        #         f"layer_{self.n_layers}_opt_{method_optimizer}.dat"
 
-        np.savetxt(os.path.join(save_data_dir, fname),
-                   best_parameters)
+        # np.savetxt(os.path.join(save_data_dir, fname),
+        #            best_parameters)
 
-        if return_final_state_vec:
-            result["state_vec"] = self.get_state_vector(best_parameters)
-            fname = f"state_vec_fenta_" \
-                    f"cas_{self.n_qubits}q_" \
-                    f"layer_{self.n_layers}_opt_{method_optimizer}.dat"
+        # if return_final_state_vec:
+        #     result["state_vec"] = self.get_state_vector(best_parameters)
+        #     fname = f"state_vec_fenta_" \
+        #             f"cas_{self.n_qubits}q_" \
+        #             f"layer_{self.n_layers}_opt_{method_optimizer}.dat"
 
-            np.save(os.path.join(save_data_dir, fname),
-                    result["state_vec"])
+        #     np.save(os.path.join(save_data_dir, fname),
+        #             result["state_vec"])
 
         return result
 

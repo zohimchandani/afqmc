@@ -221,14 +221,14 @@ def get_molecular_hamiltonian(
             basis = str(mol["basis"]).replace('\"', "").replace('\'', "")
             charge = int(mol["charge"])
             spin = int(mol["spin"])
-            unit = mol["unit"]
+            # unit = mol["unit"]
 
     molecule = gto.M(
         atom=geometry,
         spin=spin,
         basis=basis,
         charge=charge,
-        unit=unit,  # Bohr
+        # unit=unit,  # Bohr
         verbose=verbose
     )
 

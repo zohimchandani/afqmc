@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 import cudaq 
 cudaq.set_target("nvidia")
 
+import time 
 
 
 
@@ -214,13 +215,15 @@ afqmc_hamiltonian, trial_wavefunction = get_afqmc_data(pyscf_data, final_state_v
 
 # %%
 # Initialize AFQMC
+start = time.time()
+
 afqmc_msd = AFQMC.build(
     pyscf_data["mol"].nelec,
     afqmc_hamiltonian,
     trial_wavefunction,
     num_walkers = 200,
     num_steps_per_block = 10,
-    num_blocks = 250,
+    num_blocks = 100,
     timestep = 0.005,
     stabilize_freq = 5,
     seed=1,
@@ -237,6 +240,10 @@ afqmc_msd.finalise(verbose=False)
 qmc_data = extract_observable(afqmc_msd.estimators.filename, "energy")
 # np.savetxt(system + '_vqe_energy.dat', vqe_energies)
 # np.savetxt(system + '_afqmc_energy.dat', list(qmc_data["ETotal"]))
+
+end = time.time()
+
+print("Time taken for AFQMC: ", end - start)
 
 
 # %%
