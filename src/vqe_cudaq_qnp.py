@@ -286,14 +286,15 @@ class VQE(object):
         # np.savetxt(os.path.join(save_data_dir, fname),
         #            best_parameters)
 
-        # if return_final_state_vec:
-        #     result["state_vec"] = self.get_state_vector(best_parameters)
-        #     fname = f"state_vec_fenta_" \
-        #             f"cas_{self.n_qubits}q_" \
-        #             f"layer_{self.n_layers}_opt_{method_optimizer}.dat"
+        if return_final_state_vec:
+            result["state_vec"] = self.get_state_vector(best_parameters)
+            
+            # fname = f"state_vec_fenta_" \
+            #         f"cas_{self.n_qubits}q_" \
+            #         f"layer_{self.n_layers}_opt_{method_optimizer}.dat"
 
-        #     np.save(os.path.join(save_data_dir, fname),
-        #             result["state_vec"])
+            # np.save(os.path.join(save_data_dir, fname),
+            #         result["state_vec"])
 
         return result
 
