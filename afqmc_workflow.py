@@ -1,8 +1,28 @@
-import os
-import h5py
-import json
+# %% [markdown]
+# # Quantum Enhanced Auxiliary Field Quantum Monte Carlo
+# 
+# This work was done in collaboration with the Next Generation Computing team at [BASF](https://www.basf.com/global/en.html).
+# 
+# In this tutorial we implement a quantum-classical hybrid workflow for computing the ground state energies of a strongly interacting molecular system. The algorithm consists of two parts:
+# 
+# 
+# 1. A variational quantum eigensolver that uses the quantum-number-preserving ansatz proposed by [Anselmetti et al. (2021)](https://doi.org/10.1088/1367-2630/ac2cb3) to generate a quantum trial wave function $|\Psi_T\rangle$ using CUDA Quantum.
+# 
+# 2. An Auxiliary-Field Quantum Monte Carlo simulation that realizes a classical imaginary time evolution and collects the ground state energy estimates.
+# 
 
-# #For GPU acceleration of ipie, sudo -S apt-get install -y cuda-toolkit-12.4, unset CUDA_HOME and unset CUDA_PATH
+# %%
+# # Package installs
+# !pip install numba==0.60.0 -q
+# !pip install h5py==3.11.0 matplotlib==3.9.2 numpy~=1.24.4 openfermion==1.6.1 pyscf~=2.5.0 scipy~=1.14.1 pandas~=2.2.2 -q
+# !pip install git+https://github.com/JoonhoLee-Group/ipie.git@a7235c4ee5c64314d4b00e0d953804fa9b0df1c3 -q
+
+# %%
+# #For GPU acceleration of ipie: 
+# 1. install cuda toolkit: sudo -S apt-get install -y cuda-toolkit-12.4, 
+# 2. run: unset CUDA_HOME and unset CUDA_PATH
+# 4. uncomment lines below but ensure they stay above other ipie imports
+
 from ipie.config import config
 config.update_option("use_gpu", True)
 
@@ -21,10 +41,6 @@ import matplotlib.pyplot as plt
 import cudaq 
 cudaq.set_target("nvidia")
 
-import time 
-
-
-
 # %% [markdown]
 # We start by defining the structure of the molecule, the basis set, and its spin. We build the molecule object with PySCF and run a preliminary Hartree-Fock computation. Here we choose two examples: 
 # 
@@ -37,18 +53,18 @@ import time
 # 
 
 # %%
-# system = 'o3' 
-system = '10q' 
+system = 'o3' 
+# system = '10q' 
 # system = '24q' 
 
 if system == 'o3':
-
+    
     num_active_orbitals = 6
     num_active_electrons = 8
     spin = 0
-    geometry = "systems/geo_o3.xyz"
-    basis = "sto-3g"
-    # basis = "cc-pVDZ"
+    chkptfile_rohf = "chkfiles/scf_o3.chk"
+    chkptfile_cas = "chkfiles/o3/mcscf_o3.chk"
+    num_vqe_layers = 10
     
 elif system == '10q':
 
@@ -80,7 +96,6 @@ n_qubits = 2 * num_active_orbitals
 # 
 
 # %%
-
 # Get the molecular Hamiltonian and molecular data from pyscf
 data_hamiltonian = get_molecular_hamiltonian(chkptfile_rohf=chkptfile_rohf,
                                              chkptfile_cas=chkptfile_cas,
@@ -101,7 +116,6 @@ pyscf_data = data_hamiltonian["scf_data"]
 # 
 
 # %%
-
 # Define optimization methods for VQE
 optimizer_type = 'COBYLA'
 
@@ -132,11 +146,6 @@ optimized_energy = result['energy_optimized']
 vqe_energies = result["callback_energies"]
 final_state_vector = result["state_vec"]
 best_parameters = result["best_parameters"]
-
-
-# np.save('final_state_vector_' + system + '.npy', final_state_vector)
-
-# final_state_vector = np.load('final_state_vector_' + system + '.npy')
 
 # %% [markdown]
 # ### Auxiliary Field Quantum Monte Carlo (AFQMC)
@@ -215,8 +224,6 @@ afqmc_hamiltonian, trial_wavefunction = get_afqmc_data(pyscf_data, final_state_v
 
 # %%
 # Initialize AFQMC
-start = time.time()
-
 afqmc_msd = AFQMC.build(
     pyscf_data["mol"].nelec,
     afqmc_hamiltonian,
@@ -228,7 +235,7 @@ afqmc_msd = AFQMC.build(
     stabilize_freq = 5,
     seed=1,
     pop_control_freq = 5,
-    verbose=True)
+    verbose=False)
 
 
 # Run the AFQMC simulation and save data to .h5 file
@@ -238,12 +245,6 @@ afqmc_msd.finalise(verbose=False)
 
 # Extract and plot results
 qmc_data = extract_observable(afqmc_msd.estimators.filename, "energy")
-# np.savetxt(system + '_vqe_energy.dat', vqe_energies)
-# np.savetxt(system + '_afqmc_energy.dat', list(qmc_data["ETotal"]))
-
-end = time.time()
-
-print("Time taken for AFQMC: ", end - start)
 
 
 # %%
@@ -255,16 +256,19 @@ afqmc_y = list(qmc_data["ETotal"])
 afqmc_x = [i + vqe_x[-1] for i in list(range(len(afqmc_y)))]
 plt.plot(afqmc_x, afqmc_y, label="AFQMC")
 
-plt.xlabel("Optimizaion steps")
+plt.xlabel("Optimization steps")
 plt.ylabel("Energy [Ha]")
 plt.legend()
 
-plt.savefig('vqe+afqmc'+system+'_plot.png')
 
 # %% [markdown]
 # If you were to pick `system == 10q` or `24q`, representing the two active spaces of FeNTA, it would produce the following plots: 
 # 
 # ![plot1](10+24q.png)
 # 
+
+# %%
+print(cudaq.__version__)
+
 
 
